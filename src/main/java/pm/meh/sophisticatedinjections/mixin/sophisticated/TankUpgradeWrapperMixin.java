@@ -62,8 +62,9 @@ public abstract class TankUpgradeWrapperMixin {
 
     @Inject(method = "isValidFluidItem(Lnet/minecraft/world/item/ItemStack;Z)Z", at = @At("HEAD"), remap = false, cancellable = true)
     public void injectIsValidFluidItem(ItemStack stack, boolean isOutput, CallbackInfoReturnable<Boolean> cir) {
-        if (!isOutput && PotionFluidHandler.isPotionItem(stack) && (contents.isEmpty() ||
-                contents.isFluidEqual(PotionFluidHandler.getFluidFromPotionItem(stack)))) {
+        if ((!isOutput && PotionFluidHandler.isPotionItem(stack) && (contents.isEmpty() ||
+                contents.isFluidEqual(PotionFluidHandler.getFluidFromPotionItem(stack)))) ||
+                (isOutput && stack.is(Items.GLASS_BOTTLE) && !contents.isEmpty())) {
             cir.setReturnValue(true);
             cir.cancel();
         }
