@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -38,24 +39,45 @@ public abstract class TankUpgradeWrapperMixin {
     @Shadow
     public abstract int fill(FluidStack resource, IFluidHandler.FluidAction action, boolean ignoreInOutLimit);
 
+    @Shadow
+    public abstract FluidStack drain(int maxDrain, IFluidHandler.FluidAction action, boolean ignoreInOutLimit);
+
     @Inject(method = "tick(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraftforge/common/util/LazyOptional;ifPresent(Lnet/minecraftforge/common/util/NonNullConsumer;)V",
                     shift = At.Shift.AFTER, ordinal = 1), remap = false, locals = LocalCapture.CAPTURE_FAILHARD)
     public void injectTick(LivingEntity entity, Level world, BlockPos pos, CallbackInfo ci, AtomicBoolean didSomething) {
-        ItemStack stack = inventory.getStackInSlot(0);
+        ItemStack inputStack = inventory.getStackInSlot(0);
+        ItemStack outputStack = inventory.getStackInSlot(1);
 
-        if (!didSomething.get() && PotionFluidHandler.isPotionItem(stack)) {
-            FluidStack fluid = PotionFluidHandler.getFluidFromPotionItem(stack);
+        if (!didSomething.get()) {
+            if (PotionFluidHandler.isPotionItem(inputStack)) {
+                FluidStack fluid = PotionFluidHandler.getFluidFromPotionItem(inputStack);
 
-            if (contents.isEmpty() || contents.isFluidEqual(fluid) &&
-                    getTankCapacity() - contents.getAmount() >= fluid.getAmount()) {
-                stack.shrink(1);
-                // TODO handle stacks of more than one item
-                inventory.setStackInSlot(0, new ItemStack(Items.GLASS_BOTTLE));
+                if (contents.isEmpty() || contents.isFluidEqual(fluid) &&
+                        getTankCapacity() - contents.getAmount() >= fluid.getAmount()) {
+                    inputStack.shrink(1);
+                    inventory.setStackInSlot(0, new ItemStack(Items.GLASS_BOTTLE));
 
-                fill(fluid, IFluidHandler.FluidAction.EXECUTE, false);
+                    fill(fluid, IFluidHandler.FluidAction.EXECUTE, false);
 
-                didSomething.set(true);
+                    didSomething.set(true);
+                }
+            }
+
+            if (outputStack.is(Items.GLASS_BOTTLE)) {
+                int outAmount = PotionFluidHandler.getRequiredAmountForFilledBottle(outputStack, contents);
+                if (contents.getAmount() >= outAmount) {
+                    ItemStack filledItem = PotionFluidHandler.fillBottle(outputStack, contents);
+
+                    if (!PotionUtils.getMobEffects(filledItem).isEmpty()) {
+                        drain(outAmount, IFluidHandler.FluidAction.EXECUTE, false);
+
+                        outputStack.shrink(1);
+                        inventory.setStackInSlot(1, filledItem);
+
+                        didSomething.set(true);
+                    }
+                }
             }
         }
     }
