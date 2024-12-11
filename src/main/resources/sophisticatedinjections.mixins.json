@@ -5,7 +5,6 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "sophisticatedinjections.refmap.json",
   "mixins": [
-    "sophisticated.TankUpgradeWrapperHandlerMixin",
     "sophisticated.TankUpgradeWrapperMixin"
   ],
   "client": [

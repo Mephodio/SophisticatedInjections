@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,6 +57,15 @@ public abstract class TankUpgradeWrapperMixin {
 
                 didSomething.set(true);
             }
+        }
+    }
+
+    @Inject(method = "isValidFluidItem(Lnet/minecraft/world/item/ItemStack;Z)Z", at = @At("HEAD"), remap = false, cancellable = true)
+    public void injectIsValidFluidItem(ItemStack stack, boolean isOutput, CallbackInfoReturnable<Boolean> cir) {
+        if (!isOutput && PotionFluidHandler.isPotionItem(stack) && (contents.isEmpty() ||
+                contents.isFluidEqual(PotionFluidHandler.getFluidFromPotionItem(stack)))) {
+            cir.setReturnValue(true);
+            cir.cancel();
         }
     }
 }
