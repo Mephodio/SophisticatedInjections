@@ -15,9 +15,9 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -26,8 +26,16 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.registries.RegistryObject;
+import net.p3pp3rf1y.sophisticatedcore.client.gui.UpgradeGuiManager;
+import net.p3pp3rf1y.sophisticatedcore.common.gui.UpgradeContainerRegistry;
+import net.p3pp3rf1y.sophisticatedcore.common.gui.UpgradeContainerType;
 import org.slf4j.Logger;
+import pm.meh.sophisticatedinjections.upgrades.injection.InjectionUpgradeContainer;
+import pm.meh.sophisticatedinjections.upgrades.injection.InjectionUpgradeItem;
+import pm.meh.sophisticatedinjections.upgrades.injection.InjectionUpgradeTab;
+import pm.meh.sophisticatedinjections.upgrades.injection.InjectionUpgradeWrapper;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Sophisticatedinjections.MODID)
@@ -57,11 +65,17 @@ public class Sophisticatedinjections {
         output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
     }).build());
 
+    public static final RegistryObject<InjectionUpgradeItem> INJECTION_UPGRADE = ITEMS.register("injection_upgrade",
+            () -> new InjectionUpgradeItem());
+
+    private static final UpgradeContainerType<InjectionUpgradeWrapper, InjectionUpgradeContainer> INJECTION_TYPE = new UpgradeContainerType<>(InjectionUpgradeContainer::new);
+
     public Sophisticatedinjections() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(Sophisticatedinjections::registerContainers);
 
         // Register the Deferred Register to the mod event bus so blocks get registered
         BLOCKS.register(modEventBus);
@@ -97,11 +111,16 @@ public class Sophisticatedinjections {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) event.accept(EXAMPLE_BLOCK_ITEM);
     }
 
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        // Do something when the server starts
-        LOGGER.info("HELLO from server starting");
+    public static void registerContainers(RegisterEvent event) {
+        if (!event.getRegistryKey().equals(ForgeRegistries.Keys.MENU_TYPES)) {
+            return;
+        }
+
+        UpgradeContainerRegistry.register(INJECTION_UPGRADE.getId(), INJECTION_TYPE);
+
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            UpgradeGuiManager.registerTab(INJECTION_TYPE, InjectionUpgradeTab::new);
+        });
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
