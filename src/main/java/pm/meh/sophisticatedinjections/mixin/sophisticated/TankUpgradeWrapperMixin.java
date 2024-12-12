@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+import pm.meh.sophisticatedinjections.util.PotionHelper;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -65,18 +66,16 @@ public abstract class TankUpgradeWrapperMixin {
             }
 
             if (outputStack.is(Items.GLASS_BOTTLE)) {
-                int outAmount = PotionFluidHandler.getRequiredAmountForFilledBottle(outputStack, contents);
-                if (contents.getAmount() >= outAmount) {
+                int outAmount = PotionHelper.getBottleAmount();
+                if (contents.getAmount() >= outAmount && PotionHelper.isPotionFluid(contents)) {
                     ItemStack filledItem = PotionFluidHandler.fillBottle(outputStack, contents);
 
-                    if (!PotionUtils.getMobEffects(filledItem).isEmpty()) {
-                        drain(outAmount, IFluidHandler.FluidAction.EXECUTE, false);
+                    drain(outAmount, IFluidHandler.FluidAction.EXECUTE, false);
 
-                        outputStack.shrink(1);
-                        inventory.setStackInSlot(1, filledItem);
+                    outputStack.shrink(1);
+                    inventory.setStackInSlot(1, filledItem);
 
-                        didSomething.set(true);
-                    }
+                    didSomething.set(true);
                 }
             }
         }
