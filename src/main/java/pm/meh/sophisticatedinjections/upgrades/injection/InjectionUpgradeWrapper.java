@@ -1,6 +1,7 @@
 package pm.meh.sophisticatedinjections.upgrades.injection;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
@@ -28,6 +29,7 @@ public class InjectionUpgradeWrapper extends UpgradeWrapperBase<InjectionUpgrade
     public void injectIntoPlayer(Player player) {
         storageWrapper.getFluidHandler().ifPresent(fluidHandler -> {
             int portionSize = PotionHelper.getBottleAmount();
+            boolean injected = false;
 
             for (int tank = 0; tank < fluidHandler.getTanks(); tank++) {
                 FluidStack fluidInTank = fluidHandler.getFluidInTank(tank);
@@ -47,11 +49,14 @@ public class InjectionUpgradeWrapper extends UpgradeWrapperBase<InjectionUpgrade
                                 player.addEffect(new MobEffectInstance(effectInstance));
                             }
                         }
-
+                        injected = true;
                         break;
                     }
                 }
             }
+
+            String msg = injected ? "Injected potion" : "No potions available";
+            player.displayClientMessage(Component.literal(msg), true);
         });
     }
 }

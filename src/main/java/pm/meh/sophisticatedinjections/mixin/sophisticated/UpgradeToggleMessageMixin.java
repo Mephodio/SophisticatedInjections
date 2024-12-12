@@ -20,10 +20,11 @@ import java.util.Map;
 public class UpgradeToggleMessageMixin {
     @Inject(method = "lambda$handleMessage$1(Lnet/p3pp3rf1y/sophisticatedbackpacks/network/UpgradeToggleMessage;Lnet/minecraft/server/level/ServerPlayer;Lnet/p3pp3rf1y/sophisticatedbackpacks/backpack/wrapper/IBackpackWrapper;)V",
             at = @At(value = "INVOKE", target = "Lnet/p3pp3rf1y/sophisticatedcore/upgrades/IUpgradeWrapper;setEnabled(Z)V"),
-            locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
+            locals = LocalCapture.CAPTURE_FAILHARD, remap = false, cancellable = true)
     private static void injectSetEnabled(UpgradeToggleMessage msg, ServerPlayer player, IBackpackWrapper w, CallbackInfo ci, Map slotWrappers, IUpgradeWrapper upgradeWrapper) {
         if (upgradeWrapper instanceof InjectionUpgradeWrapper injectionWrapper) {
             injectionWrapper.injectIntoPlayer(player);
+            ci.cancel();
         }
     }
 }
