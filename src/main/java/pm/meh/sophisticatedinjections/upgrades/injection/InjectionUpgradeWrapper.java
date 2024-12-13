@@ -22,8 +22,8 @@ public class InjectionUpgradeWrapper extends UpgradeWrapperBase<InjectionUpgrade
     }
 
     @Override
-    public void setEnabled(boolean enabled) {
-//        super.setEnabled(enabled);
+    public boolean canBeDisabled() {
+        return false;
     }
 
     public void injectIntoPlayer(Player player) {
