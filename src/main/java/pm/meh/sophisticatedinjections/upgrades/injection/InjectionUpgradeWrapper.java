@@ -1,9 +1,13 @@
 package pm.meh.sophisticatedinjections.upgrades.injection;
 
+import com.simibubi.create.AllSoundEvents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionUtils;
@@ -55,8 +59,15 @@ public class InjectionUpgradeWrapper extends UpgradeWrapperBase<InjectionUpgrade
                 }
             }
 
-            String msg = injected ? "Injected potion" : "No potions available";
-            player.displayClientMessage(Component.literal(msg), true);
+            if (injected) {
+                player.displayClientMessage(Component.literal("Injected potion"), true);
+                player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                        AllSoundEvents.STEAM.getMainEvent(), SoundSource.PLAYERS, 1.0f, 0.8f);
+            } else {
+                player.displayClientMessage(Component.literal("No potions available"), true);
+                player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                        AllSoundEvents.SPOUTING.getMainEvent(), SoundSource.PLAYERS, 1.0f, 2.0f);
+            }
         });
     }
 }
