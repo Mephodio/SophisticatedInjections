@@ -4,6 +4,7 @@ import com.simibubi.create.AllSoundEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -90,7 +91,8 @@ public class InjectionUpgradeWrapper extends UpgradeWrapperBase<InjectionUpgrade
             player.displayClientMessage(Component.literal(msg), true);
 
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                    AllSoundEvents.SPOUTING.getMainEvent(), SoundSource.PLAYERS, 1.0f, 2.0f);
+                    injected ? SoundEvents.BOTTLE_FILL : AllSoundEvents.SPOUTING.getMainEvent(),
+                    SoundSource.PLAYERS, 1.0f, 2.0f);
         });
     }
 }
