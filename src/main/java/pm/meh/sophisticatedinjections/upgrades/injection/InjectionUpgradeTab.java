@@ -19,11 +19,10 @@ import static net.p3pp3rf1y.sophisticatedcore.client.gui.utils.GuiHelper.ICONS;
 
 public class InjectionUpgradeTab extends UpgradeSettingsTab<InjectionUpgradeContainer> {
 
-    public static final ButtonDefinition.Toggle<InjectionState> BUTTON_INJECT = ButtonDefinitions.createToggleButtonDefinition(
+    public static final ButtonDefinition.Toggle<Boolean> BUTTON_INJECT = ButtonDefinitions.createToggleButtonDefinition(
             Map.of(
-                    InjectionState.AVAILABLE, GuiHelper.getButtonStateData(new UV(192, 48), "Inject", Dimension.SQUARE_16, new Position(1, 1)),
-                    InjectionState.IN_PROGRESS, GuiHelper.getButtonStateData(new UV(160, 48), "Injecting...", Dimension.SQUARE_16, new Position(1, 1)),
-                    InjectionState.NO_POTION, GuiHelper.getButtonStateData(new UV(224, 48), "No potion", Dimension.SQUARE_16, new Position(1, 1))
+                    false, GuiHelper.getButtonStateData(new UV(192, 48), "Inject", Dimension.SQUARE_16, new Position(1, 1)),
+                    true, GuiHelper.getButtonStateData(new UV(160, 48), "Injecting...", Dimension.SQUARE_16, new Position(1, 1))
             )
     );
 
@@ -33,7 +32,7 @@ public class InjectionUpgradeTab extends UpgradeSettingsTab<InjectionUpgradeCont
         addHideableChild(new ToggleButton<>(new Position(x + 3, y + 24), BUTTON_INJECT, (button) -> getContainer().inject(), () -> {
             ClientLevel level = Minecraft.getInstance().level;
             long worldTime = level != null ? level.getGameTime() : 0;
-            return worldTime < getContainer().getSavedInjectionTime() ? InjectionState.IN_PROGRESS : InjectionState.AVAILABLE;
+            return worldTime < getContainer().getSavedInjectionTime();
         }));
     }
 
