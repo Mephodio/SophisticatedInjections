@@ -66,7 +66,7 @@ public class Sophisticatedinjections {
     }).build());
 
     public static final RegistryObject<InjectionUpgradeItem> INJECTION_UPGRADE = ITEMS.register("injection_upgrade",
-            () -> new InjectionUpgradeItem());
+            InjectionUpgradeItem::new);
 
     private static final UpgradeContainerType<InjectionUpgradeWrapper, InjectionUpgradeContainer> INJECTION_TYPE = new UpgradeContainerType<>(InjectionUpgradeContainer::new);
 
