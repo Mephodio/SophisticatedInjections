@@ -19,13 +19,15 @@ public class InjectionUpgradeTab extends UpgradeSettingsTab<InjectionUpgradeCont
 
     public static final ButtonDefinition.Toggle<Boolean> BUTTON_INJECT = ButtonDefinitions.createToggleButtonDefinition(
             Map.of(
-                    false, GuiHelper.getButtonStateData(new UV(192, 48), "Inject", Dimension.SQUARE_16, new Position(1, 1)),
-                    true, GuiHelper.getButtonStateData(new UV(160, 48), "Injecting...", Dimension.SQUARE_16, new Position(1, 1))
+                    false, GuiHelper.getButtonStateData(new UV(192, 48), "gui.sophisticatedinjections.upgrades.injection.inject.available", Dimension.SQUARE_16, new Position(1, 1)),
+                    true, GuiHelper.getButtonStateData(new UV(160, 48), "gui.sophisticatedinjections.upgrades.injection.inject.in_progress", Dimension.SQUARE_16, new Position(1, 1))
             )
     );
 
     public InjectionUpgradeTab(InjectionUpgradeContainer upgradeContainer, Position position, StorageScreenBase<?> screen) {
-        super(upgradeContainer, position, screen, Component.literal("injection"), Component.literal("injection tooltip"));
+        super(upgradeContainer, position, screen,
+                Component.translatable("gui.sophisticatedinjections.upgrades.injection"),
+                Component.translatable("gui.sophisticatedinjections.upgrades.injection.tooltip"));
 
         addHideableChild(new ToggleButton<>(new Position(x + 3, y + 24), BUTTON_INJECT, (button) -> getContainer().inject(), () -> {
             ClientLevel level = Minecraft.getInstance().level;

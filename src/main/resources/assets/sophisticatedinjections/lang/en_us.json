@@ -1,4 +1,10 @@
 {
   "item.sophisticatedinjections.injection_upgrade": "Injection Upgrade",
-  "item.sophisticatedinjections.injection_upgrade.tooltip": "Injects potion from tank. Can be activated using slot hotkey"
+  "item.sophisticatedinjections.injection_upgrade.tooltip": "Injects potion from tank. Can be activated using slot hotkey",
+  "gui.sophisticatedinjections.upgrades.injection.inject.available": "Inject",
+  "gui.sophisticatedinjections.upgrades.injection.inject.in_progress": "Injecting...",
+  "gui.sophisticatedinjections.upgrades.injection": "Injection",
+  "gui.sophisticatedinjections.upgrades.injection.tooltip": "Injection Settings",
+  "gui.sophisticatedinjections.status.injection.in_progress": "Injecting potion...",
+  "gui.sophisticatedinjections.status.injection.no_potion": "No potions available"
 }

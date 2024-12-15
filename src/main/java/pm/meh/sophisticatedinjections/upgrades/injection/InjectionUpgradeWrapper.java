@@ -90,8 +90,9 @@ public class InjectionUpgradeWrapper extends UpgradeWrapperBase<InjectionUpgrade
                 }
             }
 
-            String msg = injected ? "Injecting potion" : "No potions available";
-            player.displayClientMessage(Component.literal(msg), true);
+            String msg = injected ? "gui.sophisticatedinjections.status.injection.in_progress" :
+                    "gui.sophisticatedinjections.status.injection.no_potion";
+            player.displayClientMessage(Component.translatable(msg), true);
 
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                     injected ? SoundEvents.BOTTLE_FILL : AllSoundEvents.SPOUTING.getMainEvent(),
