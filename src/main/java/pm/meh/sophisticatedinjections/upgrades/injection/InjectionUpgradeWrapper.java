@@ -4,7 +4,6 @@ import com.simibubi.create.AllSoundEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffect;
@@ -45,7 +44,7 @@ public class InjectionUpgradeWrapper extends UpgradeWrapperBase<InjectionUpgrade
 
     @Override
     public void tick(@Nullable LivingEntity entity, Level level, BlockPos blockPos) {
-        if (scheduledInjectionTime > 0 && scheduledInjectionTime <= level.getGameTime()) {
+        if (scheduledInjectionTime > 0 && scheduledInjectionTime <= level.getGameTime() && entity != null) {
             for (MobEffectInstance effectInstance : scheduledEffects) {
                 MobEffect effect = effectInstance.getEffect();
                 if (effect.isInstantenous()) {
