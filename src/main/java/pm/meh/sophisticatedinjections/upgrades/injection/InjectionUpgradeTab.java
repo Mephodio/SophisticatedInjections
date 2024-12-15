@@ -8,29 +8,32 @@ import net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.UpgradeSettingsTab;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.controls.Button;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.controls.ButtonDefinition;
-import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.Dimension;
-import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.Position;
-import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TextureBlitData;
-import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.UV;
+import net.p3pp3rf1y.sophisticatedcore.client.gui.controls.ButtonDefinitions;
+import net.p3pp3rf1y.sophisticatedcore.client.gui.controls.ToggleButton;
+import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.*;
+
+import java.util.Map;
 
 import static net.p3pp3rf1y.sophisticatedcore.client.gui.utils.GuiHelper.GUI_CONTROLS;
 import static net.p3pp3rf1y.sophisticatedcore.client.gui.utils.GuiHelper.ICONS;
 
 public class InjectionUpgradeTab extends UpgradeSettingsTab<InjectionUpgradeContainer> {
 
-    private static final ButtonDefinition BUTTON_INJECT = new ButtonDefinition(Dimension.SQUARE_16,
-            new TextureBlitData(GUI_CONTROLS, new UV(29, 0), Dimension.SQUARE_18),
-            new TextureBlitData(GUI_CONTROLS, new UV(47, 0), Dimension.SQUARE_18),
-            new TextureBlitData(ICONS, new Position(1, 1), Dimension.SQUARE_256, new UV(192, 48), Dimension.SQUARE_16),
-            Component.literal("test"));
+    public static final ButtonDefinition.Toggle<InjectionState> BUTTON_INJECT = ButtonDefinitions.createToggleButtonDefinition(
+            Map.of(
+                    InjectionState.AVAILABLE, GuiHelper.getButtonStateData(new UV(192, 48), "Inject", Dimension.SQUARE_16, new Position(1, 1)),
+                    InjectionState.IN_PROGRESS, GuiHelper.getButtonStateData(new UV(160, 48), "Injecting...", Dimension.SQUARE_16, new Position(1, 1)),
+                    InjectionState.NO_POTION, GuiHelper.getButtonStateData(new UV(224, 48), "No potion", Dimension.SQUARE_16, new Position(1, 1))
+            )
+    );
 
     public InjectionUpgradeTab(InjectionUpgradeContainer upgradeContainer, Position position, StorageScreenBase<?> screen) {
         super(upgradeContainer, position, screen, Component.literal("injection"), Component.literal("injection tooltip"));
 
-        addHideableChild(new ToggleableButtonWidget(new Position(x + 3, y + 24), BUTTON_INJECT, (button) -> getContainer().inject(), () -> {
+        addHideableChild(new ToggleButton<>(new Position(x + 3, y + 24), BUTTON_INJECT, (button) -> getContainer().inject(), () -> {
             ClientLevel level = Minecraft.getInstance().level;
             long worldTime = level != null ? level.getGameTime() : 0;
-            return worldTime < getContainer().getSavedInjectionTime();
+            return worldTime < getContainer().getSavedInjectionTime() ? InjectionState.IN_PROGRESS : InjectionState.AVAILABLE;
         }));
     }
 
