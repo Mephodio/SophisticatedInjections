@@ -1,5 +1,8 @@
 package pm.meh.sophisticatedinjections.upgrades.injection;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.UpgradeSettingsTab;
@@ -24,8 +27,10 @@ public class InjectionUpgradeTab extends UpgradeSettingsTab<InjectionUpgradeCont
     public InjectionUpgradeTab(InjectionUpgradeContainer upgradeContainer, Position position, StorageScreenBase<?> screen) {
         super(upgradeContainer, position, screen, Component.literal("injection"), Component.literal("injection tooltip"));
 
-        addHideableChild(new Button(new Position(x + 3, y + 24), BUTTON_INJECT, (button) -> {
-            getContainer().inject();
+        addHideableChild(new ToggleableButtonWidget(new Position(x + 3, y + 24), BUTTON_INJECT, (button) -> getContainer().inject(), () -> {
+            ClientLevel level = Minecraft.getInstance().level;
+            long worldTime = level != null ? level.getGameTime() : 0;
+            return worldTime < getContainer().getSavedInjectionTime();
         }));
     }
 

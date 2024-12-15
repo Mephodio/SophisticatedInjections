@@ -21,4 +21,8 @@ public class InjectionUpgradeContainer extends UpgradeContainerBase<InjectionUpg
     public void inject() {
         sendDataToServer(() -> NBTHelper.putBoolean(new CompoundTag(), "inject", true));
     }
+
+    public long getSavedInjectionTime() {
+        return upgradeWrapper.getSavedInjectionTime();
+    }
 }

@@ -18,6 +18,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.ITickableUpgrade;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeWrapperBase;
+import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import org.jetbrains.annotations.Nullable;
 import pm.meh.sophisticatedinjections.util.PotionHelper;
 
@@ -82,6 +83,8 @@ public class InjectionUpgradeWrapper extends UpgradeWrapperBase<InjectionUpgrade
                         fluidHandler.drain(new FluidStack(fluidInTank, portionSize), IFluidHandler.FluidAction.EXECUTE, false);
                         injected = true;
                         scheduledInjectionTime = player.level().getGameTime() + INJECTION_DELAY;
+                        NBTHelper.setLong(upgrade, "scheduledInjectionTime", scheduledInjectionTime);
+                        save();
                         break;
                     }
                 }
@@ -94,5 +97,9 @@ public class InjectionUpgradeWrapper extends UpgradeWrapperBase<InjectionUpgrade
                     injected ? SoundEvents.BOTTLE_FILL : AllSoundEvents.SPOUTING.getMainEvent(),
                     SoundSource.PLAYERS, 1.0f, 2.0f);
         });
+    }
+
+    public long getSavedInjectionTime() {
+        return NBTHelper.getLong(upgrade, "scheduledInjectionTime").orElse(0L);
     }
 }
