@@ -8,6 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -43,14 +44,15 @@ public class InjectionUpgradeWrapper extends UpgradeWrapperBase<InjectionUpgrade
     }
 
     @Override
-    public void tick(@Nullable LivingEntity entity, Level level, BlockPos blockPos) {
-        if (scheduledInjectionTime > 0 && scheduledInjectionTime <= level.getGameTime() && entity != null) {
+    public void tick(@Nullable Entity entity, Level level, BlockPos blockPos) {
+        if (scheduledInjectionTime > 0 && scheduledInjectionTime <= level.getGameTime()
+                && entity instanceof LivingEntity livingEntity) {
             for (MobEffectInstance effectInstance : scheduledEffects) {
                 MobEffect effect = effectInstance.getEffect();
                 if (effect.isInstantenous()) {
-                    effect.applyInstantenousEffect(null, null, entity, effectInstance.getAmplifier(), 0.5D);
+                    effect.applyInstantenousEffect(null, null, livingEntity, effectInstance.getAmplifier(), 0.5D);
                 } else {
-                    entity.addEffect(new MobEffectInstance(effectInstance));
+                    livingEntity.addEffect(new MobEffectInstance(effectInstance));
                 }
             }
 

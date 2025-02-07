@@ -2,7 +2,7 @@ package pm.meh.sophisticatedinjections.mixin.sophisticated;
 
 import com.simibubi.create.content.fluids.potion.PotionFluidHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -45,7 +45,7 @@ public abstract class TankUpgradeWrapperMixin {
     @Inject(method = "tick(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraftforge/common/util/LazyOptional;ifPresent(Lnet/minecraftforge/common/util/NonNullConsumer;)V",
                     shift = At.Shift.AFTER, ordinal = 1), remap = false, locals = LocalCapture.CAPTURE_FAILHARD)
-    public void injectTick(LivingEntity entity, Level world, BlockPos pos, CallbackInfo ci, AtomicBoolean didSomething) {
+    public void injectTick(Entity entity, Level world, BlockPos pos, CallbackInfo ci, AtomicBoolean didSomething) {
         ItemStack inputStack = inventory.getStackInSlot(0);
         ItemStack outputStack = inventory.getStackInSlot(1);
 
