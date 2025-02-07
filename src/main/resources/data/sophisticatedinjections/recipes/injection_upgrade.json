@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "U": {
+      "item": "sophisticatedbackpacks:upgrade_base"
+    },
+    "G": {
+      "tag": "forge:glass"
+    },
+    "P": {
+      "item": "minecraft:piston"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "B": {
+      "item": "minecraft:glass_bottle"
+    }
+  },
+  "pattern": [
+    "GIG",
+    "BUB",
+    "GPG"
+  ],
+  "result": {
+    "item": "sophisticatedinjections:injection_upgrade"
+  }
+}
