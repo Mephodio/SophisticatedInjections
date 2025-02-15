@@ -9,6 +9,9 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import net.p3pp3rf1y.sophisticatedcore.api.IStorageWrapper;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeWrapperBase;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.tank.TankUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.tank.TankUpgradeWrapper;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Final;
@@ -18,20 +21,26 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import pm.meh.sophisticatedinjections.util.PotionHelper;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 @Mixin(TankUpgradeWrapper.class)
 @Debug(export = true)
-public abstract class TankUpgradeWrapperMixin {
+public abstract class TankUpgradeWrapperMixin extends UpgradeWrapperBase<TankUpgradeWrapper, TankUpgradeItem> {
     @Final
     @Shadow
     private ItemStackHandler inventory;
 
     @Shadow
     private FluidStack contents;
+
+    @Shadow
+    private long cooldownTime;
+
+    protected TankUpgradeWrapperMixin(IStorageWrapper storageWrapper, ItemStack upgrade, Consumer<ItemStack> upgradeSaveHandler) {
+        super(storageWrapper, upgrade, upgradeSaveHandler);
+    }
 
     @Shadow
     public abstract int getTankCapacity();
@@ -43,13 +52,13 @@ public abstract class TankUpgradeWrapperMixin {
     public abstract FluidStack drain(int maxDrain, IFluidHandler.FluidAction action, boolean ignoreInOutLimit);
 
     @Inject(method = "tick(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraftforge/common/util/LazyOptional;ifPresent(Lnet/minecraftforge/common/util/NonNullConsumer;)V",
-                    shift = At.Shift.AFTER, ordinal = 1), remap = false, locals = LocalCapture.CAPTURE_FAILHARD)
-    public void injectTick(Entity entity, Level world, BlockPos pos, CallbackInfo ci, AtomicBoolean didSomething) {
-        ItemStack inputStack = inventory.getStackInSlot(0);
-        ItemStack outputStack = inventory.getStackInSlot(1);
+            at = @At("TAIL"), remap = false)
+    public void injectTick(Entity entity, Level world, BlockPos pos, CallbackInfo ci) {
+        if (world.getGameTime() >= cooldownTime) {
+            ItemStack inputStack = inventory.getStackInSlot(0);
+            ItemStack outputStack = inventory.getStackInSlot(1);
+            boolean didSomething = false;
 
-        if (!didSomething.get()) {
             if (PotionFluidHandler.isPotionItem(inputStack)) {
                 FluidStack fluid = PotionFluidHandler.getFluidFromPotionItem(inputStack);
 
@@ -60,7 +69,7 @@ public abstract class TankUpgradeWrapperMixin {
 
                     fill(fluid, IFluidHandler.FluidAction.EXECUTE, false);
 
-                    didSomething.set(true);
+                    didSomething = true;
                 }
             }
 
@@ -74,8 +83,12 @@ public abstract class TankUpgradeWrapperMixin {
                     outputStack.shrink(1);
                     inventory.setStackInSlot(1, filledItem);
 
-                    didSomething.set(true);
+                    didSomething = true;
                 }
+            }
+
+            if (didSomething) {
+                cooldownTime = world.getGameTime() + upgradeItem.getTankUpgradeConfig().autoFillDrainContainerCooldown.get();
             }
         }
     }
